@@ -37,9 +37,6 @@ export function Footer() {
             <Link to={routes.privacy} className={quiet}>
               Privacy Policy
             </Link>
-            <Link to={routes.terms} className={quiet}>
-              Terms
-            </Link>
           </p>
           <a href={`mailto:${company.email}`} className={quiet}>
             {company.email}

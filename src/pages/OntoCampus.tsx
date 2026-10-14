@@ -1,8 +1,9 @@
 import { controlScreens, founding, insideScreens } from "../content/campus";
-import { cta, fictionalNote } from "../content/site";
+import { cta, fictionalNote, routes } from "../content/site";
 import { ProductLockup, Wordmarks } from "../components/brand/ProductLockup";
 import { MediaTabs } from "../components/sections/MediaTabs";
 import { ClosingCta } from "../components/sections/ClosingCta";
+import { TextLink } from "../components/ui/Button";
 import { Container } from "../components/ui/Container";
 import { Reveal } from "../components/ui/Reveal";
 import { StatusBadge } from "../components/ui/StatusBadge";
@@ -111,6 +112,9 @@ function Professions() {
           <p className="mt-6 max-w-[44ch] text-lead text-fg-soft">
             Every path is built around the real work of its field.
           </p>
+          <TextLink to={routes.network} tone="fg" className="mt-6">
+            Practitioners can help build them
+          </TextLink>
         </Reveal>
       </Container>
       <Reveal delay={150} className="mt-10 lg:mt-6">

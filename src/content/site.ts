@@ -12,9 +12,9 @@ export const routes = {
   ontocampus: "/ontocampus",
   ontocandidate: "/ontocandidate",
   about: "/about",
+  network: "/network",
   contact: "/contact",
   privacy: "/privacy",
-  terms: "/terms",
 } as const;
 
 export type EnquiryRoute = "university" | "employer" | "general";
@@ -32,6 +32,7 @@ export const cta = {
 export const navigation = [
   { label: "OntoCampus", to: routes.ontocampus },
   { label: "OntoCandidate", to: routes.ontocandidate },
+  { label: "Network", to: routes.network },
   { label: "About", to: routes.about },
 ] as const;
 

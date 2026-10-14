@@ -14,16 +14,34 @@ npm run preview    # serves dist/ locally
 
 | What | Where |
 | --- | --- |
-| Company email (footer, and where enquiries are addressed) | `company.email` in `src/content/site.ts` |
-| Privacy Policy and Terms (currently placeholder notices) | `src/pages/LegalPlaceholder.tsx`, routes in `src/App.tsx` |
+| Company email (footer, fallback emails, response notifications) | `company.email` in `src/content/site.ts` |
+| Privacy Policy text (have it legally reviewed; update its date when it changes) | `src/pages/Privacy.tsx` |
 | Public site URL for canonical and Open Graph tags | `VITE_SITE_URL` in `.env` |
+| Google Sheets endpoint for form responses | `VITE_FORMS_ENDPOINT` in `.env` (see below) |
 
-## Enquiry form
+## Form responses (Google Sheets)
 
-The site is static, so the form doesn't send mail itself. After validating, it opens the
-visitor's own email app with a message to `company.email` (founder@ontographica.com) already
-written: a subject naming the enquiry type and organisation, their message, and their details.
-They press send from their mailbox. The logic lives in `src/lib/enquiry.ts`.
+Both forms, Contact (`/contact`) and the practitioner network (`/network`), save each response as a
+row in one Google Sheet: enquiries on an "Enquiries" tab, network sign-ups on a "Network" tab. A
+small Google Apps Script receives them (`google-apps-script/Code.gs`) and can also email each new
+response to founder@ontographica.com (set `NOTIFY_EMAIL` to `""` in the script to turn that off).
+
+One-time setup, from the Google account that should own the responses:
+
+1. Create a Google Sheet, for example "Ontographica website responses".
+2. In the Sheet, open **Extensions → Apps Script**. Replace the editor's contents with
+   `google-apps-script/Code.gs` and save.
+3. Click **Deploy → New deployment**, choose type **Web app**, set **Execute as: Me** and
+   **Who has access: Anyone**, then **Deploy**. Approve the permissions Google asks for.
+4. Copy the **Web app URL** (it ends in `/exec`) into `.env` as `VITE_FORMS_ENDPOINT=...`,
+   then build and deploy the site.
+
+The tabs and their header rows are created on the first submission. If you later edit the script,
+use **Deploy → Manage deployments → Edit → New version** so the URL stays the same.
+
+Until `VITE_FORMS_ENDPOINT` is set, or if a submission fails, the forms keep the visitor's details
+and offer a ready-written email to founder@ontographica.com instead, so nothing is lost. A hidden
+spam-trap field filters out most bots. Submission logic lives in `src/lib/forms.ts`.
 
 ## Pages
 
@@ -32,9 +50,10 @@ They press send from their mailbox. The logic lives in `src/lib/enquiry.ts`.
 | `/` | "Knowledge, Engineered." hero, how the world of work is moving, an OntoCampus showcase, an OntoCandidate teaser |
 | `/ontocampus` | The product: hero, the orbit, inside the simulation, faculty view, the professions ring, and the Founding University invitation |
 | `/ontocandidate` | Hire for capability: benefits for employers, the competency profile, the path from practice to discovery |
+| `/network` | Practitioner network: facilitators and curators who bring workplace experience into simulations, with a sign-up form |
 | `/about` | Why Ontographica exists, the graduate confidence gap, what we believe, and a hand-off to both platforms |
 | `/contact` | Enquiry form. `?type=university\|employer\|general` preselects the type |
-| `/privacy`, `/terms` | Placeholders until approved legal text exists |
+| `/privacy` | Privacy Policy, written to match what the site does (`src/pages/Privacy.tsx`). `/terms` redirects home |
 
 `/vision` redirects to `/about` and `/founding-universities` to `/ontocampus#founding`, so older links keep working.
 

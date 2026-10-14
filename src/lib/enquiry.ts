@@ -1,11 +1,6 @@
-// Enquiry handling: the single integration point for the contact form.
-//
-// The site is static (GitHub Pages), so there is no server to send mail. Instead, a valid
-// enquiry opens the visitor's own email app with a message to the company address already
-// written: subject, details and their message. They press send from their own mailbox.
-// Nothing leaves the browser until they do, and no third-party service is involved.
+// Contact-form enquiries. Submission itself lives in ./forms (Google Sheets, with an email fallback).
 
-import { company } from "../content/site";
+import { fallbackMailto } from "./forms";
 
 export type EnquiryType = "university" | "employer" | "general";
 
@@ -30,11 +25,22 @@ const subjects: Record<EnquiryType, string> = {
   general: "Enquiry",
 };
 
-/** A `mailto:` link to the company address with the enquiry filled in. */
+/** The row stored in the "Enquiries" sheet. Keys must match google-apps-script/Code.gs. */
+export function enquiryRecord(payload: EnquiryPayload): Record<string, string> {
+  return {
+    type: enquiryTypeLabels[payload.type],
+    name: payload.name,
+    email: payload.email,
+    organisation: payload.organisation,
+    role: payload.role,
+    message: payload.message,
+  };
+}
+
+/** The same enquiry as a ready-written email, for when online submission isn't available. */
 export function enquiryMailto(payload: EnquiryPayload): string {
   const organisationLabel = payload.type === "university" ? "Institution" : "Organisation";
-  const subject = `${subjects[payload.type]}: ${payload.organisation}`;
-  const body = [
+  return fallbackMailto(`${subjects[payload.type]}: ${payload.organisation}`, [
     "Hello Ontographica,",
     "",
     payload.message,
@@ -45,9 +51,5 @@ export function enquiryMailto(payload: EnquiryPayload): string {
     `Email: ${payload.email}`,
     `${organisationLabel}: ${payload.organisation}`,
     payload.role ? `Role: ${payload.role}` : null,
-  ]
-    .filter((line) => line !== null)
-    .join("\r\n");
-
-  return `mailto:${company.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  ]);
 }

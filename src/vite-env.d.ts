@@ -1,7 +1,8 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_ENQUIRY_ENDPOINT?: string;
+  /** Google Apps Script web app URL that stores form responses in Google Sheets. */
+  readonly VITE_FORMS_ENDPOINT?: string;
 }
 
 interface ImportMeta {
