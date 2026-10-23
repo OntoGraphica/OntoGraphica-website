@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact – OntoGraphica</title>
+    <meta name="description" content="Get in touch with OntoGraphica. Schedule a consultation or inquire about OntoCanvas.">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo">
+                <!-- LOGO PLACEHOLDER #1 -->
+                <img src="images/ontographica-logo.png" alt="OntoGraphica Logo">
+            </a>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="services.html">Services</a>
+                <a href="ontocanvas.html">OntoCanvas</a>
+                <a href="contact.html" class="active">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main">
+        <!-- Hero Section -->
+        <section class="hero">
+            <!-- IMAGE PLACEHOLDER: Hero Background (Contact) -->
+            <div class="hero-bg-image" style="background-image: url('images/hero-bg-contact.jpg');"></div>
+            
+            <div class="container">
+                <div class="hero-content">
+                    <h1>Let's Talk Ontologies</h1>
+                    <p class="subheading">Whether you're exploring semantic infrastructure, evaluating OntoCanvas, or ready to build—we're here to help. Reach out with your questions, and let's discuss your specific challenges.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Information Section -->
+        <section>
+            <div class="container">
+                <h2>Get In Touch</h2>
+                
+                <div class="grid-2">
+                    <div>
+                        <h3>Consulting Inquiries</h3>
+                        <p>Have data challenges? Ready to build semantic infrastructure? Let's talk about your ontology needs.</p>
+                        <p><strong>Expected response time:</strong> 24 hours</p>
+                        <p><strong>Typical process:</strong> Initial conversation → Discovery call → Proposal</p>
+                    </div>
+                    <div>
+                        <h3>OntoCanvas Inquiries</h3>
+                        <p>Interested in early access to OntoCanvas? Want to join our beta program?</p>
+                        <p><strong>Typical process:</strong> Beta signup → Product demo → Early access</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Form Section -->
+        <section>
+            <div class="container">
+                <h2>Send us a Message</h2>
+                <p style="max-width: 600px; margin: 1.5rem auto;">Fill out the form below and we'll get back to you within 24 hours.</p>
+                
+                <form style="max-width: 600px; margin: 2rem auto 0;">
+                    <div class="form-group">
+                        <label for="name">Your Name</label>
+                        <input type="text" id="name" name="name" required placeholder="John Smith">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required placeholder="john@company.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="company">Company</label>
+                        <input type="text" id="company" name="company" placeholder="Your Company Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="inquiry-type">Inquiry Type</label>
+                        <select id="inquiry-type" name="inquiry-type" required>
+                            <option value="">Select an option</option>
+                            <option value="consulting">Consulting Services</option>
+                            <option value="ontocanvas">OntoCanvas Information</option>
+                            <option value="partnership">Partnership Opportunity</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" required placeholder="Tell us about your needs, challenges, or questions..."></textarea>
+                    </div>
+                    <button type="submit" onclick="
+                        const name = document.getElementById('name').value;
+                        const email = document.getElementById('email').value;
+                        const company = document.getElementById('company').value;
+                        const inquiryType = document.getElementById('inquiry-type').value;
+                        const message = document.getElementById('message').value;
+                        const subject = 'Contact Form Submission';
+                        const body = `Name: ${name}%0D%0AEmail: ${email}%0D%0ACompany: ${company}%0D%0AInquiry Type: ${inquiryType}%0D%0A%0D%0AMessage:%0D%0A${message}`;
+                        window.location.href = `mailto:ontographicaconsulting@gmail.com?subject=${encodeURIComponent(subject)}&body=${body}`;
+                        return false;
+                    ">Send Message</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Alternative Contact Methods -->
+        <section>
+            <div class="container text-center">
+                <h2>Other Ways to Connect</h2>
+                
+                <!-- SOCIAL MEDIA / CONTACT METHODS PLACEHOLDER -->
+                
+                <div class="grid-3" style="margin-top: 3rem;">
+                    <div class="card">
+                        <h3>LinkedIn</h3>
+                        <p>Follow us on LinkedIn for insights on semantic infrastructure, knowledge graphs, and data strategy.</p>
+                        <a href="https://linkedin.com/company/ontographica" class="cta-primary">Visit LinkedIn</a>
+                    </div>
+                    <div class="card">
+                        <h3>Office Hours</h3>
+                        <p>Prefer a quick call? We offer weekly office hours for initial consultations and product demos.</p>
+                        <a href="/cdn-cgi/l/email-protection#85ede0e9e9eac5eaebf1eae2f7e4f5edece6e4abeceabaf6f0e7efe0e6f1b8cae3e3ece6e0a0b7b5cdeaf0f7f6a0b7b5d7e0f4f0e0f6f1" class="cta-primary">Request a Slot</a>
+                    </div>
+                    <div class="card">
+                        <h3>Newsletter</h3>
+                        <p>Subscribe to our newsletter for updates on semantic infrastructure, OntoCanvas, and industry insights.</p>
+                        <form style="margin-top: 1rem;">
+                            <input type="email" placeholder="your@email.com" style="margin-bottom: 1rem; padding: 0.75rem; width: 100%; border: 1px solid #d0d0d0; border-radius: 4px;">
+                            <button type="submit" onclick="
+                                const email = event.target.parentElement.querySelector('input').value;
+                                window.location.href = `mailto:ontographicaconsulting@gmail.com?subject=Newsletter%20Signup&body=Please%20subscribe%20me:%20${email}`;
+                                return false;
+                            " class="cta-primary">Subscribe</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section>
+            <div class="container">
+                <h2>Frequently Asked Questions</h2>
+                
+                <div class="grid-2">
+                    <div>
+                        <h3>How long does a typical engagement take?</h3>
+                        <p>Discovery and design take 2-3 weeks. Implementation and validation typically take 2-3 months depending on complexity. Knowledge transfer is ongoing.</p>
+                    </div>
+                    <div>
+                        <h3>When will OntoCanvas be available?</h3>
+                        <p>OntoCanvas is in active development and will launch mid-2026. Join our early access program to get exclusive launch pricing and direct product input.</p>
+                    </div>
+                    <div>
+                        <h3>Do you work with existing enterprise systems?</h3>
+                        <p>Yes. We specialize in integrating ontologies with existing systems like CRM, ERP, data warehouses, and knowledge graphs. No rip-and-replace required.</p>
+                    </div>
+                    <div>
+                        <h3>What if we're new to ontologies?</h3>
+                        <p>That's our specialty. We've worked with organizations brand new to semantic infrastructure. We start with education, then design, then implementation.</p>
+                    </div>
+                    <div>
+                        <h3>Can we build a pilot first?</h3>
+                        <p>Absolutely. Many clients start with a focused pilot on a single domain or use case to prove ROI before broader implementation.</p>
+                    </div>
+                    <div>
+                        <h3>What's your pricing model?</h3>
+                        <p>We offer custom proposals based on scope, complexity, and team size. Contact us for a consultation to discuss your specific needs and budget.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section>
+            <div class="container">
+                <div class="cta-box">
+                    <h2>Ready to Explore Semantic Infrastructure?</h2>
+                    <p>Whether you have specific questions or just want to explore possibilities, we're here to help. Let's start a conversation about your data challenges.</p>
+                    <div style="margin-top: 2rem; text-align: center;">
+                        <a href="/cdn-cgi/l/email-protection#335b565f5f5c735c5d475c544152435b5a50521d5a5c0c404651595650470e7f5647144016010367525f58" class="cta-primary">Send us an Email</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div>
+                <h3>OntoGraphica</h3>
+                <p>Semantic infrastructure for enterprise knowledge systems. We help organizations transform fragmented data into structured, actionable intelligence.</p>
+            </div>
+            <div>
+                <h3>Services</h3>
+                <ul>
+                    <li><a href="services.html">Ontology Engineering</a></li>
+                    <li><a href="services.html">Knowledge Graph Strategy</a></li>
+                    <li><a href="services.html">Semantic Integration</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3>Product</h3>
+                <ul>
+                    <li><a href="ontocanvas.html">OntoCanvas</a></li>
+                    <li><a href="ontocanvas.html">Sign Up for Beta</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3>Connect</h3>
+                <p><a href="https://linkedin.com/company/ontographica">LinkedIn</a></p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 OntoGraphica. All rights reserved.</p>
+        </div>
+    </footer>
