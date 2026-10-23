@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OntoGraphica – Knowledge Architecture for AI</title>
+    <meta name="description" content="Enterprise ontology and knowledge graph consulting. Semantic infrastructure that scales with your AI ambitions.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,800;1,800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* ============================================================
+           ANIMATED HERO SPECIFIC STYLES
+           ============================================================ */
+        
+        :root {
+            --og-blue: #3b82f6;
+            --og-blue-light: #60a5fa;
+            --og-purple: #8b5cf6;
+            --og-purple-light: #a78bfa;
+            --grey: #6b6b8a;
+            --text-dark: #1a1a2e;
+            --ease: cubic-bezier(.22,1,.36,1);
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+            --font-ui: 'Inter', sans-serif;
+        }
+
+        /* Hero pinned container */
+        .hero-animated {
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #0a5a7f 0%, #1a73b8 40%, #2b9e4c 70%, #4caf50 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4rem;
+            position: relative;
+            z-index: 50;
+            overflow: hidden;
+        }
+
+        .hero-animated::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse 80% 50% at 20% 40%, rgba(26, 115, 184, 0.2) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 50% at 80% 60%, rgba(76, 175, 80, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse 50% 40% at 50% 90%, rgba(43, 158, 76, 0.1) 0%, transparent 50%);
+            animation: meshMove 20s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        @keyframes meshMove {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(2%, -2%) scale(1.02); }
+            50% { transform: translate(-1%, 1%) scale(0.98); }
+            75% { transform: translate(1%, 2%) scale(1.01); }
+        }
+
+        .hero-animated-container {
+            width: 100%;
+            max-width: 1400px;
+            display: grid;
+            grid-template-columns: 0.8fr 1.2fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Narrative text styles */
+        .hero-phrase {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .hero-phrase span {
+            font-family: var(--font-main);
+            font-size: 4.2rem;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.04em;
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+
+        .hero-phrase span[data-word="Where"] {
+            color: #8ddaf1;
+            opacity: 0.6;
+            transform: translateX(0);
+        }
+
+        .hero-phrase span[data-word="Data"] {
+            color: #60d9ff;
+        }
+
+        .hero-phrase span[data-word="Becomes"] {
+            color: #81e6d9;
+        }
+
+        .hero-phrase span[data-word="Meaningful"] {
+            color: #4caf50;
+        }
+
+        .hero-phrase span[data-word="Intelligence"] {
+            background: linear-gradient(135deg, #4caf50 60%, #1a73b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-style: italic;
+        }
+
+        /* Subtitle styles */
+        .hero-subtitle {
+            font-size: 1.2rem !important;
+            font-weight: 400 !important;
+            font-style: italic;
+            margin-top: 1rem;
+            color: #81e6d9;
+            letter-spacing: 0.02em;
+        }
+
+        /* Graph styles */
+        .semantic-canvas {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            max-width: 800px;
+        }
+
+        svg.main-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .node {
+            pointer-events: none;
+        }
+
+        body.interactive .node {
+            pointer-events: all;
+            cursor: grab;
+        }
+
+        body.interactive .node:active {
+            cursor: grabbing;
+        }
+
+        .node circle {
+            stroke: #fff;
+            stroke-width: 2;
+            transition: fill 1s ease, stroke 0.8s ease;
+        }
+
+        .node text {
+            font-family: var(--font-ui);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            fill: var(--text-dark);
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .node.visible text {
+            opacity: 0.7;
+        }
+
+        line.connection {
+            stroke-width: 2;
+            opacity: 0;
+            transition: opacity 1s ease, stroke 1s ease;
+        }
+
+        .rel-label {
+            font-family: var(--font-ui);
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0;
+            paint-order: stroke;
+            stroke: white;
+            stroke-width: 6px;
+            stroke-linejoin: round;
+        }
+
+        /* Header hidden by default during hero */
+        header {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-animated-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .hero-phrase span {
+                font-size: 3rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem !important;
+            }
+
+            .semantic-canvas {
+                max-width: 500px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-animated {
+                padding: 0 1.5rem;
+            }
+
+            .hero-phrase span {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 0.9rem !important;
+            }
+
+            .semantic-canvas {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="images/ontographica-logo.png" alt="OntoGraphica Logo">
+            </a>
+            <nav>
+                <a href="index.html" class="active">Home</a>
+                <a href="services.html">Services</a>
+                <a href="ontocanvas.html">OntoCanvas</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Animated Hero Section -->
+    <section class="hero-animated" id="heroAnimated">
+        <div class="hero-animated-container">
+            <div class="hero-phrase">
+                <span data-word="Where">Where</span>
+                <span data-word="Data">Data</span>
+                <span data-word="Becomes">Becomes</span>
+                <span data-word="Meaningful">Meaningful</span>
+                <span data-word="Intelligence">Intelligence</span>
+                <span data-word="Subtitle" class="hero-subtitle">— engineered, governed, and AI-ready</span>
+            </div>
+
+            <div class="semantic-canvas">
+                <svg class="main-svg" id="canvas" viewBox="0 0 600 600">
+                    <g id="edges-group"></g>
+                    <g id="labels-group"></g>
+                    <g id="nodes-group"></g>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <main id="main">
+        <!-- Problem Section -->
+<section>
+    <div class="container">
+        <h2>Unlocking the Full Potential of Your Data</h2>
+        <div class="grid-2">
+            <div>
+                <h3>Shared Meaning Across the Organization</h3>
+                <p>Your teams generate valuable data across many systems. When Sales, Operations, and Analytics align on shared definitions—like what a "customer" truly represents—that data becomes dramatically more powerful.</p>
+                <p>With consistent semantics and quality standards, integration becomes simpler, reporting becomes trustworthy, and insights can flow freely across the business.</p>
+            </div>
+            <div>
+                <h3>A Strong Foundation for AI</h3>
+                <p>High-performing AI starts with clear, well-defined data. Models trained on consistent concepts produce predictions that are more accurate, explainable, and reliable.</p>
+                <p>When systems understand how concepts like "customer" and "account" relate—and the rules that govern them—AI can reason, learn, and scale with confidence. That foundation is ontology.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+        <!-- Benefits/Features Section -->
+        <section>
+            <div class="container">
+                <h2>How OntoGraphica Solves It</h2>
+                
+                <div class="grid-3">
+                    <div class="card">
+                        <h3>Unified Data Foundation</h3>
+                        <p>A single semantic layer that all systems can reference, eliminating confusion and enabling consistent reporting.</p>
+                        <ul class="feature-list">
+                            <li>Single source of truth</li>
+                            <li>Consistent definitions</li>
+                            <li>Unified naming</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>AI-Ready Infrastructure</h3>
+                        <p>Structured knowledge that machine learning models can understand and leverage for better predictions.</p>
+                        <ul class="feature-list">
+                            <li>Machine-readable data</li>
+                            <li>Rich relationships</li>
+                            <li>Semantic meaning</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Enterprise Scalability</h3>
+                        <p>Built for organizations with complex data landscapes, multiple systems, and evolving business needs.</p>
+                        <ul class="feature-list">
+                            <li>Handles complexity</li>
+                            <li>Future-proof design</li>
+                            <li>Vendor-neutral</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section>
+            <div class="container">
+                <div class="cta-box">
+                    <h2>We Build the Infrastructure</h2>
+                    <p>Ontologies designed by engineers who understand the rigor of knowledge modeling and the reality of enterprise constraints. We don't theorize—we build systems that work in your environment.</p>
+                    <div style="margin-top: 2rem;">
+                        <a href="services.html" class="cta-primary">Explore Our Services</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div>
+                <h3>OntoGraphica</h3>
+                <p>Semantic infrastructure for enterprise knowledge systems. We help organizations transform fragmented data into structured, actionable intelligence.</p>
+            </div>
+            <div>
+                <h3>Services</h3>
+                <ul>
+                    <li><a href="services.html">Ontology Engineering</a></li>
+                    <li><a href="services.html">Knowledge Graph Strategy</a></li>
+                    <li><a href="services.html">Semantic Integration</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3>Product</h3>
+                <ul>
+                    <li><a href="ontocanvas.html">OntoCanvas</a></li>
+                    <li><a href="ontocanvas.html">Sign Up for Beta</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3>Connect</h3>
+                <p><a href="https://linkedin.com/company/ontographica">LinkedIn</a></p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 OntoGraphica. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        /* ============================================================
+           GRAPH DATA & SETUP
+           ============================================================ */
+
+        const nodes = [
+            { id: 'Regulation', start: [350, 100], end: [120, 220], color: '#1a73b8', size: 14, drift: 0 },
+            { id: 'Policy',     start: [350, 50],  end: [320, 80],  color: '#60d9ff', size: 11, drift: 2.1 },
+            { id: 'Product',    start: [100, 150], end: [480, 220], color: '#4caf50', size: 11, drift: 1.5 },
+            { id: 'Contract',   start: [550, 500], end: [300, 480], color: '#1a73b8', size: 12, drift: 6.0 },
+            { id: 'Workflow',   start: [650, 400], end: [480, 400], color: '#4caf50', size: 11, drift: 5.2 },
+            { id: 'Role',       start: [450, 580], end: [150, 400], color: '#60d9ff', size: 11, drift: 1.1 },
+            
+            { id: 'Customer',   start: [600, 150], end: [520, 120], color: '#1a73b8', size: 7, drift: 3.0 },
+            { id: 'System',     start: [150, 500], end: [100, 520], color: '#4caf50', size: 7, drift: 4.5 },
+            { id: 'Record',     start: [500, 50],  end: [540, 60],  color: '#60d9ff', size: 5, drift: 4.0 },
+            { id: 'Attribute',  start: [150, 50],  end: [60, 60],   color: '#81e6d9', size: 5, drift: 0.3 }
+        ];
+
+        const relationships = [
+            { from: 'Role', to: 'Regulation', label: 'compliance', t: 0.35, color: '#1a73b8' },
+            { from: 'Role', to: 'Contract', label: 'assumesRole', t: 0.35, color: '#1a73b8' },
+            { from: 'Role', to: 'Customer', label: 'assesedBy', t: 0.55, color: '#4caf50' },
+            { from: 'Contract', to: 'Regulation', label: 'Owner', t: 0.55, color: '#60d9ff' },
+            { from: 'Regulation', to: 'Customer', label: 'governs', t: 0.45, color: '#4caf50' },
+            { from: 'Contract', to: 'Workflow', label: 'triggers', t: 0.65, color: '#60d9ff' },
+            { from: 'Role', to: 'Workflow', label: 'performs', t: 0.75, color: '#1a73b8' },
+            { from: 'Attribute', to: 'Regulation', label: 'Typeof', t: 0.35, color: '#81e6d9' },
+            { from: 'System', to: 'Contract', label: 'assumesRole', t: 0.35, color: '#81e6d9' },
+            { from: 'Record', to: 'Customer', label: 'recordedIn', t: 0.55, color: '#81e6d9' },
+            { from: 'Workflow', to: 'Product', label: 'Owner', t: 0.55, color: '#81e6d9' },
+            { from: 'Product', to: 'Customer', label: 'governs', t: 0.45, color: '#81e6d9' }
+        ];
+
+        const svg = document.getElementById('canvas');
+        const nodesG = document.getElementById('nodes-group');
+        const edgesG = document.getElementById('edges-group');
+        const labelsG = document.getElementById('labels-group');
+        const wordSpans = document.querySelectorAll('.hero-phrase span');
+        const heroSection = document.getElementById('heroAnimated');
+        const header = document.querySelector('header');
+
+        let draggedNode = null;
+
+        // Initialize nodes
+        nodes.forEach(n => {
+            n.x = n.start[0];
+            n.y = n.start[1];
+            const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            g.classList.add("node");
+            g.id = `node-${n.id}`;
+            
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute('r', n.size);
+            circle.style.fill = '#f0f4f8';
+            
+            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.textContent = n.id;
+            text.setAttribute('dx', n.size + 10);
+            text.setAttribute('dy', 5);
+            
+            g.append(circle, text);
+            g.addEventListener('mousedown', (e) => {
+                if (!document.body.classList.contains('interactive')) return;
+                draggedNode = n;
+                const pt = svg.createSVGPoint();
+                pt.x = e.clientX;
+                pt.y = e.clientY;
+                const svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+                n.dragOffX = svgP.x - n.x;
+                n.dragOffY = svgP.y - n.y;
+            });
+            nodesG.appendChild(g);
+        });
+
+        // Initialize relationships
+        relationships.forEach((rel, i) => {
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.classList.add('connection');
+            line.id = `line-${i}`;
+            line.style.stroke = '#eef2f6';
+            
+            const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            txt.classList.add('rel-label');
+            txt.setAttribute('text-anchor', 'middle');
+            txt.textContent = rel.label;
+            txt.id = `label-${i}`;
+            
+            edgesG.appendChild(line);
+            labelsG.appendChild(txt);
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!draggedNode) return;
+            const pt = svg.createSVGPoint();
+            pt.x = e.clientX;
+            pt.y = e.clientY;
+            const svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+            draggedNode.end[0] = Math.max(50, svgP.x - draggedNode.dragOffX);
+            draggedNode.end[1] = svgP.y - draggedNode.dragOffY;
+            draggedNode.start[0] = draggedNode.end[0];
+            draggedNode.start[1] = draggedNode.end[1];
+        });
+
+        window.addEventListener('mouseup', () => draggedNode = null);
+
+        /* ============================================================
+           GSAP SCROLL ANIMATION
+           ============================================================ */
+
+        let animationState = { progress: 0 };
+        let time = 0;
+
+        // Create scroll trigger for hero - EXTENDED scroll duration for better reading time
+        const heroTimeline = gsap.timeline({
+            scrollTrigger: {
+                trigger: heroSection,
+                start: "top top",
+                end: "bottom 20%",  // Changed from "bottom top" to "bottom 20%" for extended scroll time
+                scrub: 1.2,
+                pin: true,
+                markers: false,
+                onUpdate: (self) => {
+                    // Add pause/ease after Intelligence word - slow down progress between 0.55-0.70
+                    let adjustedProgress = self.progress;
+                    if (self.progress > 0.55 && self.progress < 0.70) {
+                        // Ease the progress - make it slower in this range
+                        const pauseRange = (self.progress - 0.55) / (0.70 - 0.55);
+                        adjustedProgress = 0.55 + (pauseRange * 0.15 * 0.6); // Slowed down
+                    } else if (self.progress >= 0.70) {
+                        adjustedProgress = 0.55 + 0.09 + ((self.progress - 0.70) / (1 - 0.70)) * (1 - 0.55 - 0.09);
+                    }
+                    
+                    animationState.progress = adjustedProgress;
+                    
+                    // Show header when Intelligence word appears (around 55% progress)
+                    if (self.progress > 0.55) {
+                        gsap.to(header, { opacity: 1, pointerEvents: 'auto', duration: 0.3 });
+                    } else {
+                        gsap.to(header, { opacity: 0, pointerEvents: 'none', duration: 0.3 });
+                    }
+                    
+                    // Enable interactive at the end
+                    if (self.progress > 0.95) {
+                        document.body.classList.add('interactive');
+                    }
+                }
+            }
+        });
+
+        // Animate words (skip "Where" since it's visible from start)
+        wordSpans.forEach((span, i) => {
+            if (span.dataset.word !== "Where") {
+                heroTimeline.to(span, {
+                    opacity: 1,
+                    x: 0,
+                    duration: 0.8
+                }, span.dataset.t);
+            }
+        });
+
+        // Animation loop for nodes and graph
+        function animationLoop() {
+            time += 0.008;
+            const progress = animationState.progress;
+
+            // Update node positions
+            nodes.forEach(n => {
+                const el = document.getElementById(`node-${n.id}`);
+                const circle = el.querySelector('circle');
+                
+                n.x = n.start[0] + (n.end[0] - n.start[0]) * progress;
+                n.y = n.start[1] + (n.end[1] - n.start[1]) * progress;
+
+                const sway = Math.max(0, (progress - 0.45) * 12);
+                const floatX = Math.sin(time + n.drift) * sway;
+                const floatY = Math.cos(time * 0.75 + n.drift) * (sway * 0.8);
+
+                el.setAttribute('transform', `translate(${n.x + floatX}, ${n.y + floatY})`);
+                el.classList.toggle('visible', progress > 0.1);
+
+                if (progress > 0.45) {
+                    circle.style.fill = n.color;
+                } else {
+                    circle.style.fill = "#f0f4f8";
+                }
+            });
+
+            // Update relationships
+            relationships.forEach((rel, i) => {
+                const l = document.getElementById(`line-${i}`);
+                const lb = document.getElementById(`label-${i}`);
+                const nA = nodes.find(n => n.id === rel.from);
+                const nB = nodes.find(n => n.id === rel.to);
+                
+                const getT = (id) => {
+                    const t = document.getElementById(`node-${id}`).getAttribute('transform');
+                    const parts = t.split('(')[1].split(',');
+                    return [parseFloat(parts[0]), parseFloat(parts[1])];
+                };
+                
+                const posA = getT(nA.id);
+                const posB = getT(nB.id);
+                
+                l.setAttribute('x1', posA[0]);
+                l.setAttribute('y1', posA[1]);
+                l.setAttribute('x2', posB[0]);
+                l.setAttribute('y2', posB[1]);
+                l.style.opacity = progress > rel.t ? 0.6 : 0;
+                
+                if (progress > 0.6) {
+                    l.style.stroke = rel.color;
+                    lb.style.fill = rel.color;
+                } else {
+                    l.style.stroke = '#eef2f6';
+                    lb.style.fill = 'var(--text-dark)';
+                }
+
+                lb.setAttribute('x', (posA[0] + posB[0] + posB[0]) / 2);
+                lb.setAttribute('y', (posA[1] + posB[1]) / 2);
+            });
+
+            requestAnimationFrame(animationLoop);
+        }
+
+        animationLoop();
+    </script>
+</body>
+</html>

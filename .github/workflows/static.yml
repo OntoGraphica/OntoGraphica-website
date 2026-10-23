@@ -1,43 +1,100 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+# Publishes ontographica.com to GitHub Pages.
+#
+# The repository holds two websites:
+#   - new: the Vite + React site at the repository root (built into dist/)
+#   - old: the previous static site in old-site/ (published as-is)
+#
+# To switch sites: Actions > "Publish site" > Run workflow > choose new or old > Run workflow.
+# The choice is saved in live-site.txt, so later pushes keep publishing the site you picked.
+name: Publish site
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      site:
+        description: Which website should ontographica.com show?
+        type: choice
+        options:
+          - new
+          - old
+        required: true
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: read
+  contents: write # to save the choice in live-site.txt
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+# One deployment at a time; let an in-progress production deploy finish.
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Choose the site
+        id: choose
+        env:
+          REQUESTED: ${{ inputs.site }}
+        run: |
+          site="${REQUESTED:-$(tr -d '[:space:]' < live-site.txt)}"
+          if [ "$site" != "new" ] && [ "$site" != "old" ]; then
+            echo "live-site.txt must say new or old (found '$site')." >&2
+            exit 1
+          fi
+          echo "site=$site" >> "$GITHUB_OUTPUT"
+          echo "Publishing the $site website." >> "$GITHUB_STEP_SUMMARY"
+
+      # Saves a button choice so later pushes publish the same site. Commits made with the
+      # workflow's own token don't start another run.
+      - name: Remember the choice
+        if: inputs.site != ''
+        continue-on-error: true # never block publishing over this
+        env:
+          SITE: ${{ steps.choose.outputs.site }}
+        run: |
+          if [ "$(tr -d '[:space:]' < live-site.txt)" = "$SITE" ]; then exit 0; fi
+          printf '%s\n' "$SITE" > live-site.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Publish the $SITE website"
+          git push
+
+      - name: Set up Node
+        if: steps.choose.outputs.site == 'new'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Build the new site
+        if: steps.choose.outputs.site == 'new'
+        # Also writes dist/404.html so deep links like /about load the app.
+        run: |
+          npm ci
+          npm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ steps.choose.outputs.site == 'new' && 'dist' || 'old-site' }}
+
   deploy:
+    needs: build
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: '.'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
